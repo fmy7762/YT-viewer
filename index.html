@@ -11,9 +11,6 @@
   <meta name="apple-mobile-web-app-title" content="YT Viewer" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
 
-  <!-- Google Identity Services (Phase 4: OAuth) -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-
   <style>
     :root {
       --bg: #0f0f0f;
@@ -443,18 +440,13 @@
         <div class="settings-h1">設定</div>
         <div id="auth-status"></div>
 
-        <!-- Phase 4: Google OAuth UI -->
-        <div id="oauth-section">
-          <div id="google-signin-btn"></div>
-        </div>
-
-        <!-- Manual API Key Section -->
-        <div id="manual-key-section" style="display:none;">
-          <div class="settings-desc">YouTube Data API v3 キーを手動で設定します（OAuth の代わり）。</div>
-          <label class="form-label">API キー</label>
+        <!-- API Key Section -->
+        <div id="manual-key-section">
+          <div class="settings-desc">YouTube Data API v3 キーを設定すると、トレンド動画を見たり、動画を検索・再生したりできます。キーは無料で取得できます。</div>
+          <label class="form-label">API キー（無料で取得可能）</label>
           <input class="form-input" id="api-key-input" type="password" placeholder="AIza..." />
           <button class="btn-primary" id="save-key-btn">保存して適用</button>
-          <button class="btn-secondary" id="clear-key-btn">キーを削除</button>
+          <button class="btn-secondary" id="clear-key-btn">キーをクリア</button>
         </div>
 
         <div class="divider"></div>
@@ -542,105 +534,27 @@ let uiState = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// PHASE 4: Google OAuth
+// PHASE 4: Authentication (simplified - API key only)
 // ─────────────────────────────────────────────────────────────
-function initGoogleSignIn() {
-  if (typeof google === 'undefined') {
-    console.error('Google Identity Services not loaded');
-    return;
+function initAuth() {
+  console.log('[Auth] Initializing authentication...');
+
+  // Restore API key from localStorage if exists
+  if (authState.apiKey) {
+    authState.type = 'apikey';
+    console.log('[Auth] API key found in localStorage');
   }
 
-  // Check if already have token in sessionStorage
-  const savedToken = sessionStorage.getItem('yt_access_token');
-  if (savedToken) {
-    authState.accessToken = savedToken;
-    authState.type = 'oauth';
-    updateAuthUI();
-    loadHome();
-    return;
-  }
-
-  google.accounts.id.initialize({
-    client_id: '773479629029-j0uf9g5nkct5l5jjs87i0b9jnknt2iql.apps.googleusercontent.com',
-    callback: handleGoogleSignIn,
-  });
-
-  google.accounts.id.renderButton(
-    document.getElementById('google-signin-btn'),
-    {
-      theme: 'dark',
-      size: 'large',
-      width: '300',
-      text: 'signin_with',
-    }
-  );
-
-  updateAuthUI();
-}
-
-function handleGoogleSignIn(response) {
-  // Decode JWT to get user info
-  const base64Url = response.credential.split('.')[1];
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
-    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
-  const decoded = JSON.parse(jsonPayload);
-
-  // Store credentials
-  sessionStorage.setItem('yt_access_token', response.credential);
-  sessionStorage.setItem('yt_id_token', response.credential);
-
-  authState.type = 'oauth';
-  authState.accessToken = response.credential;
-  authState.userName = decoded.name;
-  authState.userEmail = decoded.email;
-  authState.userPicture = decoded.picture;
-
-  console.log('✅ Signed in as:', decoded.email);
-  updateAuthUI();
-  loadHome();
-}
-
-function signOut() {
-  google.accounts.id.disableAutoSelect();
-  sessionStorage.removeItem('yt_access_token');
-  sessionStorage.removeItem('yt_id_token');
-  authState.type = 'none';
-  authState.accessToken = null;
-  authState.userName = null;
-  authState.userEmail = null;
   updateAuthUI();
 }
 
 function updateAuthUI() {
   const statusEl = document.getElementById('auth-status');
-  const oauthEl = document.getElementById('oauth-section');
-  const keyEl = document.getElementById('manual-key-section');
 
-  if (authState.type === 'oauth') {
-    statusEl.innerHTML = `
-      <div class="auth-box">
-        <div class="auth-avatar" ${authState.userPicture ? `style="background:none"` : ''}>
-          ${authState.userPicture ? `<img src="${authState.userPicture}" alt="">` : authState.userName?.[0] || '?'}
-        </div>
-        <div class="auth-info">
-          <div class="auth-name">✅ ${authState.userName}</div>
-          <div class="auth-email">${authState.userEmail}</div>
-        </div>
-        <button class="btn-secondary" onclick="signOut()" style="width:80px;height:36px;margin:0;font-size:12px;">ログアウト</button>
-      </div>
-    `;
-    oauthEl.style.display = 'none';
-    keyEl.style.display = 'none';
-  } else if (authState.apiKey) {
-    statusEl.innerHTML = '<div class="status-badge status-ok">✅ APIキーが設定されています</div>';
-    oauthEl.style.display = 'block';
-    keyEl.style.display = 'block';
+  if (authState.apiKey) {
+    statusEl.innerHTML = '<div class="status-badge status-ok">✅ APIキーが設定されました。動画を検索・再生できます。</div>';
   } else {
-    statusEl.innerHTML = '<div class="status-badge status-warn">⚠️ 認証が必要です。上のGoogleボタンでサインインするか、APIキーを入力してください。</div>';
-    oauthEl.style.display = 'block';
-    keyEl.style.display = 'block';
+    statusEl.innerHTML = '<div class="status-badge status-warn">⚠️ APIキーが必要です。下から取得・設定してください。</div>';
   }
 }
 
@@ -650,14 +564,12 @@ function updateAuthUI() {
 async function api(endpoint, params) {
   const url = new URL(`${API}/${endpoint}`);
 
-  // Use access token if OAuth, otherwise use API key
-  if (authState.type === 'oauth' && authState.accessToken) {
-    url.searchParams.set('access_token', authState.accessToken);
-  } else if (authState.apiKey) {
-    url.searchParams.set('key', authState.apiKey);
-  } else {
-    throw new Error('認証が必要です');
+  // Use API key (simplified - no OAuth)
+  if (!authState.apiKey) {
+    throw new Error('APIキーが設定されていません。設定タブで入力してください。');
   }
+
+  url.searchParams.set('key', authState.apiKey);
 
   Object.entries(params).forEach(([k, v]) => {
     if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, v);
@@ -712,7 +624,7 @@ async function loadHome(append = false) {
   if (uiState.busy && append) return;
   uiState.busy = true;
 
-  if (!authState.accessToken && !authState.apiKey) {
+  if (!authState.apiKey) {
     renderNoAuth('home-list');
     uiState.busy = false;
     return;
@@ -770,7 +682,7 @@ function doSearchFromInput() {
 }
 
 async function runSearch(q, append = false) {
-  if (!authState.accessToken && !authState.apiKey) {
+  if (!authState.apiKey) {
     renderNoAuth('search-results');
     return;
   }
@@ -932,7 +844,7 @@ function exitPiP() {
 }
 
 async function loadRelated(id, title) {
-  if (!authState.accessToken && !authState.apiKey) {
+  if (!authState.apiKey) {
     document.getElementById('related-list').innerHTML = '';
     return;
   }
@@ -1032,7 +944,7 @@ function errHtml(msg) {
 }
 
 function renderNoAuth(id) {
-  document.getElementById(id).innerHTML = emptyHtml('🔐', '認証が必要です', 'Googleでサインインするか、APIキーを設定してください。');
+  document.getElementById(id).innerHTML = emptyHtml('🔐', '認証が必要です', '設定タブでAPIキーを入力してください。');
 }
 
 function emptyHtml(icon, h, p) {
@@ -1084,13 +996,10 @@ function clearKey() {
 // ─────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   // Restore API key if exists
-  if (authState.apiKey) {
-    authState.type = 'apikey';
-  }
   document.getElementById('api-key-input').value = authState.apiKey;
 
-  // Setup Google Sign-In
-  initGoogleSignIn();
+  // Setup Authentication
+  initAuth();
 
   // Tab bar
   document.getElementById('tab-bar').addEventListener('click', e => {
