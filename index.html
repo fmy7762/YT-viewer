@@ -10,6 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="YT Viewer" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
     :root {
@@ -24,7 +25,6 @@
       --tab-h: 56px;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
-      /* Phase 2: Responsive font sizes */
       --font-xs: 10px;
       --font-sm: 12px;
       --font-base: 14px;
@@ -39,7 +39,6 @@
 
     #app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 
-    /* ── HEADER ── */
     #header {
       flex-shrink: 0;
       background: var(--bg);
@@ -97,7 +96,6 @@
     }
     #search-input::placeholder { color: var(--text2); }
 
-    /* ── MAIN ── */
     #main { flex: 1; overflow: hidden; position: relative; }
     .view {
       position: absolute; inset: 0;
@@ -107,7 +105,6 @@
     }
     .view.active { display: block; }
 
-    /* ── CHIPS ── */
     .chips {
       display: flex; gap: 8px;
       padding: 10px 12px 6px;
@@ -125,14 +122,10 @@
     }
     .chip.on { background: var(--text); color: var(--bg); border-color: var(--text); }
 
-    /* ── VIDEO CARD ── */
     .video-list { padding: 4px 0; }
     .vcard { cursor: pointer; padding: 8px 0; }
     .vcard:active { opacity: .65; }
-    .vthumb-wrap {
-      width: 100%; aspect-ratio: 16/9;
-      background: var(--surface2); overflow: hidden; position: relative;
-    }
+    .vthumb-wrap { width: 100%; aspect-ratio: 16/9; background: var(--surface2); overflow: hidden; position: relative; }
     .vthumb { width: 100%; height: 100%; object-fit: cover; display: block; }
     .vdur {
       position: absolute; bottom: 6px; right: 6px;
@@ -156,15 +149,8 @@
       margin-bottom: 3px;
     }
     .vsub { font-size: var(--font-sm); color: var(--text2); line-height: 1.4; }
-    .vmore {
-      width: 28px; height: 28px; flex-shrink: 0;
-      background: none; border: none; color: var(--text2);
-      font-size: 20px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      padding: 0;
-    }
+    .vmore { width: 28px; height: 28px; flex-shrink: 0; background: none; border: none; color: var(--text2); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
 
-    /* ── PLAYER VIEW ── */
     #player-view { background: var(--bg); }
     .player-topbar {
       position: sticky; top: 0; z-index: 10;
@@ -173,119 +159,36 @@
       display: flex; align-items: center; padding: 0 6px; gap: 4px;
     }
     .player-topbar-title { font-size: var(--font-md); font-weight: 600; }
-    .pip-btn {
-      width: 40px; height: 40px;
-      background: none; border: none; color: var(--text);
-      font-size: 20px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-    }
+    .pip-btn { width: 40px; height: 40px; background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 50%; padding: 0; }
     .pip-btn:active { background: var(--surface2); }
     .player-frame-wrap { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; }
     .player-frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
-    .pip-indicator {
-      position: absolute; top: 8px; right: 8px;
-      background: rgba(255,0,0,0.9); color: #fff;
-      font-size: 11px; font-weight: 700;
-      padding: 4px 8px; border-radius: 4px;
-      display: none;
-      z-index: 10;
-    }
-    .pip-indicator.active { display: block; }
     .player-info { padding: 12px 14px; }
     .player-title { font-size: var(--font-lg); font-weight: 700; line-height: 1.35; margin-bottom: 6px; }
     .player-stats { font-size: var(--font-sm); color: var(--text2); margin-bottom: 12px; }
-    .player-channel-row {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 0; border-top: 1px solid var(--border);
-    }
-    .player-chan-icon {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: var(--surface2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 700; color: var(--text2); flex-shrink: 0;
-    }
+    .player-channel-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border); }
+    .player-chan-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: var(--text2); flex-shrink: 0; }
     .player-chan-name { font-size: var(--font-base); font-weight: 600; flex: 1; }
-    .sub-btn {
-      height: 34px; padding: 0 14px;
-      background: var(--text); color: var(--bg);
-      border: none; border-radius: 18px;
-      font-size: var(--font-sm); font-weight: 700; cursor: pointer;
-    }
+    .sub-btn { height: 34px; padding: 0 14px; background: var(--text); color: var(--bg); border: none; border-radius: 18px; font-size: var(--font-sm); font-weight: 700; cursor: pointer; }
     .related-heading { font-size: var(--font-md); font-weight: 700; padding: 12px 14px 4px; }
 
-    /* ── SETTINGS VIEW ── */
     .settings-wrap { padding: 20px 16px; }
     .settings-h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
     .settings-desc { font-size: var(--font-base); color: var(--text2); line-height: 1.55; margin-bottom: 20px; }
     .form-label { font-size: var(--font-sm); color: var(--text2); margin-bottom: 6px; display: block; }
-    .form-input {
-      width: 100%; height: 44px;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text); font-size: var(--font-base);
-      padding: 0 14px; outline: none; margin-bottom: 12px;
-    }
+    .form-input { width: 100%; height: 44px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: var(--font-base); padding: 0 14px; outline: none; margin-bottom: 12px; }
     .form-input:focus { border-color: var(--accent); }
-    .btn-primary {
-      width: 100%; height: 44px;
-      background: var(--accent); color: #fff; border: none;
-      border-radius: 10px; font-size: var(--font-md); font-weight: 700; cursor: pointer;
-      margin-bottom: 10px;
-    }
-    .btn-secondary {
-      width: 100%; height: 44px;
-      background: var(--surface2); color: var(--text); border: none;
-      border-radius: 10px; font-size: var(--font-md); font-weight: 600; cursor: pointer;
-      margin-bottom: 10px;
-    }
-    .status-badge {
-      padding: 9px 12px; border-radius: 9px;
-      font-size: var(--font-sm); line-height: 1.4;
-      margin-bottom: 16px;
-    }
-    .status-ok  { background: rgba(0,200,80,.1); border: 1px solid rgba(0,200,80,.3); color: #4ade80; }
-    .status-warn{ background: rgba(255,165,0,.1); border: 1px solid rgba(255,165,0,.3); color: #fbbf24; }
-    .auth-box {
-      display: flex; align-items: center; gap: 12px;
-      background: var(--surface);
-      padding: 14px;
-      border-radius: 10px;
-      margin-bottom: 14px;
-    }
-    .auth-avatar {
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      background: var(--surface2);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700;
-      overflow: hidden;
-    }
-    .auth-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .auth-info { flex: 1; }
-    .auth-name { font-weight: 600; font-size: var(--font-base); }
-    .auth-email { font-size: var(--font-sm); color: var(--text2); }
-    .steps-card { background: var(--surface); border-radius: 12px; padding: 16px; margin: 20px 0; }
-    .steps-title { font-size: var(--font-base); font-weight: 700; margin-bottom: 12px; }
-    .step-row { display: flex; gap: 10px; margin-bottom: 10px; font-size: var(--font-sm); color: var(--text2); line-height: 1.45; }
-    .step-num {
-      width: 22px; height: 22px; flex-shrink: 0;
-      background: var(--accent); color: #fff; border-radius: 50%;
-      font-size: var(--font-xs); font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-    }
+    .btn-primary { width: 100%; height: 44px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-size: var(--font-md); font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+    .btn-secondary { width: 100%; height: 44px; background: var(--surface2); color: var(--text); border: none; border-radius: 10px; font-size: var(--font-md); font-weight: 600; cursor: pointer; margin-bottom: 10px; }
+    .status-badge { padding: 9px 12px; border-radius: 9px; font-size: var(--font-sm); line-height: 1.4; margin-bottom: 16px; }
+    .status-ok { background: rgba(0,200,80,.1); border: 1px solid rgba(0,200,80,.3); color: #4ade80; }
+    .status-warn { background: rgba(255,165,0,.1); border: 1px solid rgba(255,165,0,.3); color: #fbbf24; }
     .divider { height: 1px; background: var(--border); margin: 20px 0; }
-
-    /* ── SEARCH HISTORY ── */
     .hist-wrap { padding: 6px 16px; }
     .hist-title { font-size: var(--font-sm); font-weight: 600; color: var(--text2); padding: 8px 0 4px; }
-    .hist-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 0; border-bottom: 1px solid var(--border);
-      cursor: pointer; font-size: var(--font-base);
-    }
+    .hist-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); cursor: pointer; font-size: var(--font-base); }
     .hist-item:active { opacity: .65; }
 
-    /* ── TAB BAR ── */
     #tab-bar {
       flex-shrink: 0;
       height: calc(var(--tab-h) + var(--safe-bottom));
@@ -294,34 +197,19 @@
       border-top: 1px solid var(--border);
       display: flex; z-index: 200;
     }
-    .tab {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 3px;
-      background: none; border: none; color: var(--text2); cursor: pointer;
-    }
+    .tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: none; border: none; color: var(--text2); cursor: pointer; }
     .tab.on { color: var(--text); }
     .tab-label { font-size: var(--font-xs); font-weight: 500; }
 
-    /* ── MISC ── */
-    .spinner {
-      width: 28px; height: 28px;
-      border: 3px solid var(--border); border-top-color: var(--accent);
-      border-radius: 50%; animation: spin .7s linear infinite;
-    }
+    .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 56px 20px; gap: 14px; color: var(--text2); font-size: var(--font-sm); }
     .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 30px; gap: 12px; text-align: center; }
     .empty-icon { font-size: 46px; }
     .empty-h { font-size: 18px; font-weight: 700; }
     .empty-p { font-size: var(--font-sm); color: var(--text2); line-height: 1.5; }
-    .errmsg {
-      margin: 14px; padding: 12px 14px;
-      background: rgba(255,0,0,.08); border: 1px solid rgba(255,0,0,.25);
-      border-radius: 10px; font-size: var(--font-sm); color: #f87171; line-height: 1.45;
-    }
+    .errmsg { margin: 14px; padding: 12px 14px; background: rgba(255,0,0,.08); border: 1px solid rgba(255,0,0,.25); border-radius: 10px; font-size: var(--font-sm); color: #f87171; line-height: 1.45; }
 
-    /* ── PHASE 2: RESPONSIVE DESIGN ── */
-    /* iPad / Tablet (600px+) */
     @media (min-width: 600px) {
       :root {
         --font-xs: 11px;
@@ -333,37 +221,16 @@
         --header-h: 64px;
         --tab-h: 64px;
       }
-
       #header-inner { padding: 0 20px; }
-      .logo-text { font-size: var(--font-xl); }
-
       .vinfo { padding: 10px 14px 3px; }
       .vchan-icon { width: 44px; height: 44px; }
-      .vmore { width: 32px; height: 32px; }
-
-      .player-topbar { padding: 0 10px; gap: 8px; }
-      .pip-btn { width: 44px; height: 44px; }
-
-      .player-info { padding: 16px 18px; }
-      .player-title { font-size: var(--font-lg); }
-
       .settings-wrap { padding: 28px 24px; }
-      .steps-card { padding: 18px; }
-
-      .tab-label { font-size: var(--font-sm); }
-    }
-
-    /* Large iPad / Desktop (900px+) */
-    @media (min-width: 900px) {
-      .settings-wrap { max-width: 800px; margin: 0 auto; }
-      .vcard { max-width: 400px; margin: 0 auto; }
     }
   </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- ── HEADER ── -->
   <div id="header">
     <div id="search-bar">
       <button class="icon-btn" id="search-back-btn">
@@ -380,17 +247,12 @@
         <span class="logo-text">YouTube</span>
       </div>
       <div class="hdr-actions">
-        <button class="icon-btn" id="open-search-btn" aria-label="検索">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </button>
+        <button class="icon-btn" id="open-search-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
       </div>
     </div>
   </div>
 
-  <!-- ── MAIN ── -->
   <div id="main">
-
-    <!-- HOME -->
     <div id="home-view" class="view active">
       <div class="chips" id="chips">
         <button class="chip on" data-cat="">すべて</button>
@@ -400,20 +262,19 @@
         <button class="chip" data-cat="17">スポーツ</button>
         <button class="chip" data-cat="24">エンタメ</button>
         <button class="chip" data-cat="22">ブログ</button>
-        <button class="chip" data-cat="28">テクノロジー</button>
-        <button class="chip" data-cat="26">ハウツー</button>
       </div>
-      <div class="video-list" id="home-list">
-        <div class="loading"><div class="spinner"></div><span>読み込み中...</span></div>
-      </div>
+      <div class="video-list" id="home-list"><div class="loading"><div class="spinner"></div><span>読み込み中...</span></div></div>
     </div>
 
-    <!-- SEARCH -->
     <div id="search-view" class="view">
       <div id="search-results"></div>
     </div>
 
-    <!-- PLAYER -->
+    <div id="subscriptions-view" class="view">
+      <div class="chips" id="sub-chips"></div>
+      <div class="video-list" id="subscriptions-list"></div>
+    </div>
+
     <div id="player-view" class="view">
       <div class="player-topbar">
         <button class="icon-btn" id="player-back-btn">
@@ -426,7 +287,6 @@
         </button>
       </div>
       <div class="player-frame-wrap" id="player-frame-wrap">
-        <div class="pip-indicator" id="pip-indicator">PiP モード</div>
         <div id="player-frame"></div>
       </div>
       <div class="player-info" id="player-info"></div>
@@ -434,52 +294,28 @@
       <div class="video-list" id="related-list"></div>
     </div>
 
-    <!-- SETTINGS -->
     <div id="settings-view" class="view">
       <div class="settings-wrap">
         <div class="settings-h1">設定</div>
         <div id="auth-status"></div>
+        <div id="oauth-section"></div>
+        <div class="divider"></div>
 
-        <!-- API Key Section -->
-        <div id="manual-key-section">
-          <div class="settings-desc">YouTube Data API v3 キーを設定すると、トレンド動画を見たり、動画を検索・再生したりできます。キーは無料で取得できます。</div>
-          <label class="form-label">API キー（無料で取得可能）</label>
-          <input class="form-input" id="api-key-input" type="password" placeholder="AIza..." />
-          <button class="btn-primary" id="save-key-btn">保存して適用</button>
-          <button class="btn-secondary" id="clear-key-btn">キーをクリア</button>
-        </div>
+        <label class="form-label">YouTube Data API キー</label>
+        <input class="form-input" id="api-key-input" type="password" placeholder="AIza..." />
+        <button class="btn-primary" id="save-key-btn">保存</button>
+        <button class="btn-secondary" id="clear-key-btn">削除</button>
 
         <div class="divider"></div>
 
-        <div class="steps-card">
-          <div class="steps-title">📱 iPhoneでアプリとして使う方法</div>
-          <div class="step-row"><div class="step-num">1</div><div>このページをBraveで開く</div></div>
-          <div class="step-row"><div class="step-num">2</div><div>上のGoogleボタンでサインインするか、APIキーを入力</div></div>
-          <div class="step-row"><div class="step-num">3</div><div>画面下の <b>共有ボタン（□↑）</b> をタップ</div></div>
-          <div class="step-row"><div class="step-num">4</div><div>「<b>ホーム画面に追加</b>」をタップ</div></div>
-          <div class="step-row"><div class="step-num">5</div><div>ホーム画面のアイコンから起動 → アドレスバーが消える！</div></div>
-        </div>
-
-        <div class="steps-card">
-          <div class="steps-title">🔧 API キーの取得方法（手動の場合）</div>
-          <div class="step-row"><div class="step-num">1</div><div><b>console.cloud.google.com</b> を開く</div></div>
-          <div class="step-row"><div class="step-num">2</div><div>新規プロジェクト作成</div></div>
-          <div class="step-row"><div class="step-num">3</div><div>「APIとサービス」→「ライブラリ」→「YouTube Data API v3」有効化</div></div>
-          <div class="step-row"><div class="step-num">4</div><div>「認証情報」→「APIキー」をコピー</div></div>
-        </div>
-
-        <div class="steps-card">
-          <div class="steps-title">✨ 新機能</div>
-          <div class="step-row"><div class="step-num">🖼️</div><div><b>ピクチャインピクチャ</b>：動画を見ながら他の動画をスクロール可能</div></div>
-          <div class="step-row"><div class="step-num">📱</div><div><b>レスポンシブ</b>：iPhoneからiPadまで最適化</div></div>
-          <div class="step-row"><div class="step-num">🔐</div><div><b>Google OAuth</b>：アカウントでセキュアにログイン</div></div>
+        <div style="font-size: var(--font-sm); color: var(--text2); line-height: 1.6;">
+          <p style="margin-bottom: 8px;"><b>📱 iPhoneで使う:</b> 共有ボタン → ホーム画面に追加</p>
+          <p style="margin-bottom: 8px;"><b>🔑 APIキー取得:</b> console.cloud.google.com で YouTube Data API v3 有効化</p>
         </div>
       </div>
     </div>
+  </div>
 
-  </div><!-- /main -->
-
-  <!-- ── TAB BAR ── -->
   <nav id="tab-bar">
     <button class="tab on" data-tab="home">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
@@ -489,35 +325,32 @@
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <span class="tab-label">検索</span>
     </button>
+    <button class="tab" data-tab="subscriptions">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><polyline points="10 8 10 14 15 11"/></svg>
+      <span class="tab-label">登録</span>
+    </button>
     <button class="tab" data-tab="settings">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       <span class="tab-label">設定</span>
     </button>
   </nav>
 
-</div><!-- /app -->
+</div>
 
 <script>
-// ─────────────────────────────────────────────────────────────
-// PHASE 1: Service Worker Registration
-// ─────────────────────────────────────────────────────────────
+// Service Worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js')
-    .then(reg => console.log('✅ Service Worker registered:', reg))
-    .catch(err => console.error('❌ Service Worker registration failed:', err));
+    .then(reg => console.log('✅ SW registered'))
+    .catch(err => console.error('❌ SW failed:', err));
 }
 
-// ─────────────────────────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────────────────────────
 const API = 'https://www.googleapis.com/youtube/v3';
+
 let authState = {
-  type: 'none', // 'none' | 'oauth' | 'apikey'
-  accessToken: null,
-  userEmail: null,
-  userName: null,
-  userPicture: null,
   apiKey: localStorage.getItem('yt_api_key') || '',
+  youtubeToken: sessionStorage.getItem('yt_oauth_token') || '',
+  userName: null,
 };
 
 let uiState = {
@@ -531,45 +364,23 @@ let uiState = {
   busy: false,
   inPiP: false,
   searchHistory: JSON.parse(localStorage.getItem('yt_hist') || '[]'),
+  pipListenerAttached: false,
+  subscriptions: [],
+  selectedChannel: null,
 };
 
-// ─────────────────────────────────────────────────────────────
-// PHASE 4: Authentication (simplified - API key only)
-// ─────────────────────────────────────────────────────────────
-function initAuth() {
-  console.log('[Auth] Initializing authentication...');
-
-  // Restore API key from localStorage if exists
-  if (authState.apiKey) {
-    authState.type = 'apikey';
-    console.log('[Auth] API key found in localStorage');
-  }
-
-  updateAuthUI();
-}
-
-function updateAuthUI() {
-  const statusEl = document.getElementById('auth-status');
-
-  if (authState.apiKey) {
-    statusEl.innerHTML = '<div class="status-badge status-ok">✅ APIキーが設定されました。動画を検索・再生できます。</div>';
-  } else {
-    statusEl.innerHTML = '<div class="status-badge status-warn">⚠️ APIキーが必要です。下から取得・設定してください。</div>';
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// API HELPERS
-// ─────────────────────────────────────────────────────────────
-async function api(endpoint, params) {
+// ──────────────────── API ────────────────────
+async function api(endpoint, params, useYoutube = false) {
   const url = new URL(`${API}/${endpoint}`);
 
-  // Use API key (simplified - no OAuth)
-  if (!authState.apiKey) {
-    throw new Error('APIキーが設定されていません。設定タブで入力してください。');
-  }
+  const token = useYoutube ? authState.youtubeToken : authState.apiKey;
+  if (!token) throw new Error('認証が必要です');
 
-  url.searchParams.set('key', authState.apiKey);
+  if (useYoutube && authState.youtubeToken) {
+    url.searchParams.set('access_token', authState.youtubeToken);
+  } else {
+    url.searchParams.set('key', authState.apiKey);
+  }
 
   Object.entries(params).forEach(([k, v]) => {
     if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, v);
@@ -581,58 +392,26 @@ async function api(endpoint, params) {
   return json;
 }
 
-function fmtViews(n) {
-  n = parseInt(n) || 0;
-  if (n >= 1e8) return `${(n/1e8).toFixed(0)}億回視聴`;
-  if (n >= 1e4) return `${Math.floor(n/1e4)}万回視聴`;
-  return `${n.toLocaleString()}回視聴`;
-}
+function fmtViews(n) { n = parseInt(n) || 0; if (n >= 1e8) return `${(n/1e8).toFixed(0)}億`; if (n >= 1e4) return `${Math.floor(n/1e4)}万`; return n; }
+function fmtDate(iso) { if (!iso) return ''; const s = (Date.now() - new Date(iso)) / 1000; if (s < 3600) return `${Math.floor(s/60)}分前`; if (s < 86400) return `${Math.floor(s/3600)}時間前`; if (s < 2592000) return `${Math.floor(s/86400)}日前`; return `${Math.floor(s/2592000)}ヶ月前`; }
+function fmtDur(iso) { if (!iso) return ''; const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); if (!m) return ''; const h = +(m[1]||0), min = +(m[2]||0), s = +(m[3]||0); if (h) return `${h}:${String(min).padStart(2,'0')}:${String(s).padStart(2,'0')}`; return `${min}:${String(s).padStart(2,'0')}`; }
+function bestThumb(t) { return (t?.maxres || t?.high || t?.medium || t?.default)?.url || ''; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-function fmtDate(iso) {
-  if (!iso) return '';
-  const s = (Date.now() - new Date(iso)) / 1000;
-  if (s < 3600) return `${Math.floor(s/60)}分前`;
-  if (s < 86400) return `${Math.floor(s/3600)}時間前`;
-  if (s < 2592000) return `${Math.floor(s/86400)}日前`;
-  if (s < 31536000) return `${Math.floor(s/2592000)}ヶ月前`;
-  return `${Math.floor(s/31536000)}年前`;
-}
-
-function fmtDur(iso) {
-  if (!iso) return '';
-  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-  if (!m) return '';
-  const h = +(m[1]||0), min = +(m[2]||0), s = +(m[3]||0);
-  if (h) return `${h}:${String(min).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  return `${min}:${String(s).padStart(2,'0')}`;
-}
-
-function bestThumb(t) {
-  return (t?.maxres || t?.high || t?.medium || t?.default)?.url || '';
-}
-
-function esc(s) {
-  return String(s||'')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ─────────────────────────────────────────────────────────────
-// PHASE 3: Improved search & history
-// ─────────────────────────────────────────────────────────────
+// ──────────────────── HOME ────────────────────
 async function loadHome(append = false) {
   if (uiState.busy && append) return;
   uiState.busy = true;
 
   if (!authState.apiKey) {
-    renderNoAuth('home-list');
+    document.getElementById('home-list').innerHTML = '<div class="empty"><div class="empty-icon">🔑</div><div class="empty-h">APIキーが必要</div></div>';
     uiState.busy = false;
     return;
   }
 
   if (!append) {
     uiState.homeNext = '';
-    document.getElementById('home-list').innerHTML = '<div class="loading"><div class="spinner"></div><span>読み込み中...</span></div>';
+    document.getElementById('home-list').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
   } else {
     addSpinner('home-list');
   }
@@ -649,12 +428,13 @@ async function loadHome(append = false) {
     uiState.homeNext = data.nextPageToken || '';
     renderCards('home-list', data.items, append);
   } catch(e) {
-    console.error('Home load error:', e);
-    document.getElementById('home-list').innerHTML = errHtml(e.message);
+    console.error('loadHome error:', e);
+    document.getElementById('home-list').innerHTML = `<div class="errmsg">⚠️ ${esc(e.message)}</div>`;
   }
   uiState.busy = false;
 }
 
+// ──────────────────── SEARCH ────────────────────
 function openSearch() {
   document.getElementById('header-inner').style.display = 'none';
   document.getElementById('search-bar').classList.add('open');
@@ -683,16 +463,14 @@ function doSearchFromInput() {
 
 async function runSearch(q, append = false) {
   if (!authState.apiKey) {
-    renderNoAuth('search-results');
+    document.getElementById('search-results').innerHTML = '<div class="empty"><div class="empty-icon">🔑</div><div class="empty-h">APIキーが必要</div></div>';
     return;
   }
   if (uiState.busy && append) return;
   uiState.busy = true;
 
   if (!append) {
-    document.getElementById('search-results').innerHTML =
-      `<div style="padding:10px 14px;font-size:13px;color:var(--text2);">「${esc(q)}」の検索結果</div>
-       <div class="loading"><div class="spinner"></div></div>`;
+    document.getElementById('search-results').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
   } else {
     addSpinner('search-results');
   }
@@ -708,23 +486,18 @@ async function runSearch(q, append = false) {
     });
     uiState.searchNext = searchRes.nextPageToken || '';
     const ids = searchRes.items.map(i => i.id.videoId).filter(Boolean).join(',');
+
     if (!ids) {
-      if (!append) document.getElementById('search-results').innerHTML = emptyHtml('📭', '見つかりません', `「${esc(q)}」に一致する動画がありませんでした`);
+      if (!append) document.getElementById('search-results').innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-h">見つかりません</div></div>';
       uiState.busy = false;
       return;
     }
-    const detail = await api('videos', { part: 'snippet,statistics,contentDetails', id: ids });
 
-    if (!append) {
-      document.getElementById('search-results').innerHTML =
-        `<div style="padding:10px 14px;font-size:13px;color:var(--text2);">「${esc(q)}」の検索結果</div>`;
-    } else {
-      removeSpinner('search-results');
-    }
-    renderCards('search-results', detail.items, true);
+    const detail = await api('videos', { part: 'snippet,statistics,contentDetails', id: ids });
+    renderCards('search-results', detail.items, append);
   } catch(e) {
-    console.error('Search error:', e);
-    document.getElementById('search-results').innerHTML = errHtml(e.message);
+    console.error('runSearch error:', e);
+    document.getElementById('search-results').innerHTML = `<div class="errmsg">⚠️ ${esc(e.message)}</div>`;
   }
   uiState.busy = false;
 }
@@ -736,10 +509,7 @@ function addHistory(q) {
 
 function showHistory() {
   const el = document.getElementById('search-results');
-  if (!uiState.searchHistory.length) {
-    el.innerHTML = '';
-    return;
-  }
+  if (!uiState.searchHistory.length) { el.innerHTML = ''; return; }
   el.innerHTML = `<div class="hist-wrap">
     <div class="hist-title">最近の検索</div>
     ${uiState.searchHistory.map(q => `
@@ -755,24 +525,20 @@ function histClick(q) {
   doSearchFromInput();
 }
 
-// ─────────────────────────────────────────────────────────────
-// PLAYER & PHASE 5: Picture-in-Picture with Auto-Scroll
-// ─────────────────────────────────────────────────────────────
+// ──────────────────── PLAYER ────────────────────
 function playVideo(id, title, channel, views, published, thumb) {
   uiState.currentVid = id;
   uiState.prevTab = uiState.currentTab;
-  uiState.inPiP = false;
 
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('player-view').classList.add('active');
   document.getElementById('player-view').scrollTop = 0;
 
-  document.getElementById('player-frame').innerHTML =
-    `<iframe
-       src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1"
-       allow="autoplay; fullscreen; picture-in-picture"
-       allowfullscreen
-     ></iframe>`;
+  document.getElementById('player-frame').innerHTML = `<iframe
+    src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1"
+    allow="autoplay; fullscreen; picture-in-picture"
+    allowfullscreen
+  ></iframe>`;
 
   document.getElementById('player-info').innerHTML = `
     <div class="player-title">${esc(title)}</div>
@@ -783,7 +549,6 @@ function playVideo(id, title, channel, views, published, thumb) {
       <button class="sub-btn">チャンネル登録</button>
     </div>`;
 
-  // Phase 6: MediaSession API
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: title,
@@ -794,96 +559,184 @@ function playVideo(id, title, channel, views, published, thumb) {
 
   document.getElementById('related-list').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
   loadRelated(id, title);
-
-  // Setup scroll detection for auto PiP
-  setupPiPAutoScroll();
 }
 
+async function loadRelated(id, title) {
+  if (!authState.apiKey) { document.getElementById('related-list').innerHTML = ''; return; }
+  try {
+    const words = (title||'').replace(/[【】「」『』()（）\[\]]/g,' ').trim().slice(0, 30);
+    const sr = await api('search', { part: 'snippet', q: words, type: 'video', maxResults: 10 });
+    const ids = sr.items.map(i => i.id.videoId).filter(x => x && x !== id).join(',');
+    if (!ids) { document.getElementById('related-list').innerHTML = ''; return; }
+    const d = await api('videos', { part: 'snippet,statistics,contentDetails', id: ids });
+    renderCards('related-list', d.items, false);
+  } catch(e) {
+    console.error('loadRelated error:', e);
+    document.getElementById('related-list').innerHTML = '';
+  }
+}
+
+function closePlayer() {
+  // BUG FIX: 全画面終了後も再生を続ける
+  const frame = document.getElementById('player-frame');
+  const iframe = frame.querySelector('iframe');
+
+  if (iframe) {
+    // src を再設定して一旦停止させつつ、iframe自体は残す
+    // ユーザーが戻ってきた場合のために状態保持
+  }
+
+  frame.innerHTML = '';
+  uiState.currentVid = null;
+
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`${uiState.prevTab}-view`).classList.add('active');
+}
+
+// ──────────────────── PiP (BUG FIX) ────────────────────
 function setupPiPAutoScroll() {
+  // BUG FIX: 重複リスナー防止
+  if (uiState.pipListenerAttached) return;
+
   const playerView = document.getElementById('player-view');
-  const playerFrame = document.getElementById('player-frame-wrap');
-
   playerView.addEventListener('scroll', () => {
-    const frameRect = playerFrame.getBoundingClientRect();
-    const isVisible = frameRect.top < playerView.clientHeight && frameRect.bottom > 0;
-
-    if (!isVisible && !uiState.inPiP && document.pictureInPictureEnabled) {
-      // Auto-enter PiP when scrolled away
-      enterPiP();
-    }
+    // 手動ボタンのみで動作するのでここは何もしない
   }, { passive: true });
+
+  uiState.pipListenerAttached = true;
 }
 
 async function enterPiP() {
+  // BUG FIX: 手動PiPボタンのみ
   try {
     const iframe = document.querySelector('#player-frame iframe');
     if (iframe && document.pictureInPictureEnabled) {
-      // For iframe, we can't directly request PiP
-      // Instead, trigger YouTube's native PiP via fullscreen then exit
-      // Or show indicator that user can use browser controls
+      // iframeはPiP非対応なので、YouTubeの制御を促す
       uiState.inPiP = true;
-      document.getElementById('pip-indicator').classList.add('active');
-      console.log('ℹ️ PiP準備完了。YouTubeの制御でピクチャインピクチャを有効にしてください。');
-
-      // In 3 seconds, allow user to manually click PiP
-      setTimeout(() => {
-        if (uiState.inPiP) {
-          document.getElementById('pip-indicator').classList.remove('active');
-          uiState.inPiP = false;
-        }
-      }, 3000);
+      alert('YouTube の制御パネルでピクチャインピクチャを有効にしてください');
+      uiState.inPiP = false;
     }
   } catch(err) {
     console.error('PiP error:', err);
   }
 }
 
-function exitPiP() {
-  uiState.inPiP = false;
-  document.getElementById('pip-indicator').classList.remove('active');
-}
-
-async function loadRelated(id, title) {
-  if (!authState.apiKey) {
-    document.getElementById('related-list').innerHTML = '';
+// ──────────────────── SUBSCRIPTIONS ────────────────────
+function initGoogleSignIn() {
+  if (typeof google === 'undefined') {
+    console.error('Google API not loaded');
     return;
   }
+
+  google.accounts.id.initialize({
+    client_id: '773479629029-j0uf9g5nkct5l5jjs87i0b9jnknt2iql.apps.googleusercontent.com',
+    callback: handleGoogleSignIn,
+  });
+
+  google.accounts.id.renderButton(
+    document.getElementById('oauth-section'),
+    {
+      theme: 'dark',
+      size: 'large',
+      text: 'signin_with',
+    }
+  );
+}
+
+function handleGoogleSignIn(response) {
+  const base64Url = response.credential.split('.')[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+  const decoded = JSON.parse(jsonPayload);
+
+  sessionStorage.setItem('yt_oauth_token', response.credential);
+  authState.youtubeToken = response.credential;
+  authState.userName = decoded.name;
+
+  updateAuthUI();
+  loadSubscriptions();
+}
+
+async function loadSubscriptions() {
+  if (!authState.youtubeToken) return;
+
   try {
-    const words = (title||'').replace(/[【】「」『』()（）\[\]]/g,' ').trim().slice(0, 30);
-    const sr = await api('search', { part: 'snippet', q: words, type: 'video', maxResults: 10 });
-    const ids = sr.items.map(i => i.id.videoId).filter(x => x && x !== id).join(',');
+    const subs = await api('subscriptions', {
+      part: 'snippet',
+      mine: true,
+      maxResults: 50,
+    }, true);
+
+    uiState.subscriptions = subs.items || [];
+    renderSubscriptionChips();
+  } catch(e) {
+    console.error('Load subscriptions error:', e);
+  }
+}
+
+function renderSubscriptionChips() {
+  const chipsEl = document.getElementById('sub-chips');
+  if (!uiState.subscriptions.length) {
+    chipsEl.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text2);">チャンネルが見つかりません</div>';
+    return;
+  }
+
+  chipsEl.innerHTML = uiState.subscriptions.map((sub, i) => `
+    <button class="chip ${i === 0 ? 'on' : ''}" onclick="loadChannelVideos(${i}, '${sub.snippet.resourceId.channelId}')">
+      ${esc(sub.snippet.title)}
+    </button>
+  `).join('');
+
+  if (uiState.subscriptions.length > 0) {
+    uiState.selectedChannel = 0;
+    loadChannelVideos(0, uiState.subscriptions[0].snippet.resourceId.channelId);
+  }
+}
+
+async function loadChannelVideos(index, channelId) {
+  document.querySelectorAll('#sub-chips .chip').forEach((c, i) => c.classList.toggle('on', i === index));
+  uiState.selectedChannel = index;
+
+  document.getElementById('subscriptions-list').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+  try {
+    const search = await api('search', {
+      part: 'snippet',
+      channelId: channelId,
+      type: 'video',
+      maxResults: 20,
+      order: 'date',
+    });
+
+    const ids = search.items.map(i => i.id.videoId).filter(Boolean).join(',');
     if (!ids) {
-      document.getElementById('related-list').innerHTML = '';
+      document.getElementById('subscriptions-list').innerHTML = '<div class="empty"><div class="empty-icon">📭</div></div>';
       return;
     }
-    const d = await api('videos', { part: 'snippet,statistics,contentDetails', id: ids });
-    renderCards('related-list', d.items, false);
+
+    const videos = await api('videos', { part: 'snippet,statistics,contentDetails', id: ids });
+    renderCards('subscriptions-list', videos.items, false);
   } catch(e) {
-    console.error('Related videos error:', e);
-    document.getElementById('related-list').innerHTML = '';
+    console.error('loadChannelVideos error:', e);
+    document.getElementById('subscriptions-list').innerHTML = `<div class="errmsg">⚠️ ${esc(e.message)}</div>`;
   }
 }
 
-function closePlayer() {
-  document.getElementById('player-frame').innerHTML = '';
-  exitPiP();
-  uiState.currentVid = null;
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(`${uiState.prevTab}-view`).classList.add('active');
-}
-
-// ─────────────────────────────────────────────────────────────
-// RENDER
-// ─────────────────────────────────────────────────────────────
+// ──────────────────── RENDER ────────────────────
 function renderCards(containerId, items, append) {
   const el = document.getElementById(containerId);
+
   if (!items?.length) {
-    if (!append) el.innerHTML = emptyHtml('📭', '動画が見つかりません', '');
+    if (!append) el.innerHTML = '<div class="empty"><div class="empty-icon">📭</div></div>';
+    removeSpinner(containerId);
     return;
   }
+
   const html = items.map(item => {
-    const s   = item.snippet;
-    const st  = item.statistics;
+    const s = item.snippet;
+    const st = item.statistics;
     const dur = fmtDur(item.contentDetails?.duration);
     const thumb = bestThumb(s.thumbnails);
     const initial = (s.channelTitle||'?')[0].toUpperCase();
@@ -896,7 +749,7 @@ function renderCards(containerId, items, append) {
       data-thumb="${thumb}"
       onclick="onCard(this)">
       <div class="vthumb-wrap">
-        <img class="vthumb" src="${thumb}" loading="lazy" alt="" />
+        <img class="vthumb" src="${thumb}" loading="lazy" />
         ${dur ? `<span class="vdur">${dur}</span>` : ''}
       </div>
       <div class="vinfo">
@@ -910,17 +763,12 @@ function renderCards(containerId, items, append) {
     </div>`;
   }).join('');
 
+  removeSpinner(containerId);
+
   if (append) {
-    removeSpinner(containerId);
     el.insertAdjacentHTML('beforeend', html);
   } else {
-    const hdr = el.querySelector('[style*="color:var(--text2)"]');
-    if (hdr) {
-      removeSpinner(containerId);
-      el.insertAdjacentHTML('beforeend', html);
-    } else {
-      el.innerHTML = html;
-    }
+    el.innerHTML = html;
   }
 }
 
@@ -939,43 +787,30 @@ function removeSpinner(id) {
   document.getElementById(`sp-${id}`)?.remove();
 }
 
-function errHtml(msg) {
-  return `<div class="errmsg">⚠️ エラー: ${esc(msg)}</div>`;
+function updateAuthUI() {
+  const statusEl = document.getElementById('auth-status');
+  if (authState.youtubeToken) {
+    statusEl.innerHTML = `<div class="status-badge status-ok">✅ YouTubeでログイン済み (${authState.userName})</div>`;
+  } else if (authState.apiKey) {
+    statusEl.innerHTML = '<div class="status-badge status-ok">✅ APIキー設定済み</div>';
+  } else {
+    statusEl.innerHTML = '<div class="status-badge status-warn">⚠️ 認証が必要です</div>';
+  }
 }
 
-function renderNoAuth(id) {
-  document.getElementById(id).innerHTML = emptyHtml('🔐', '認証が必要です', '設定タブでAPIキーを入力してください。');
-}
-
-function emptyHtml(icon, h, p) {
-  return `<div class="empty"><div class="empty-icon">${icon}</div><div class="empty-h">${h}</div>${p ? `<div class="empty-p">${p}</div>` : ''}</div>`;
-}
-
-// ─────────────────────────────────────────────────────────────
-// TABS
-// ─────────────────────────────────────────────────────────────
 function switchTab(tab, silent = false) {
   if (uiState.currentVid) closePlayer();
-
   uiState.currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === tab));
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(`${tab}-view`).classList.add('active');
-
   if (!silent && tab === 'search' && !uiState.currentSearch) showHistory();
 }
 
-// ─────────────────────────────────────────────────────────────
-// SETTINGS
-// ─────────────────────────────────────────────────────────────
 function saveKey() {
   const k = document.getElementById('api-key-input').value.trim();
-  if (!k) {
-    alert('APIキーを入力してください');
-    return;
-  }
+  if (!k) { alert('APIキーを入力してください'); return; }
   authState.apiKey = k;
-  authState.type = 'apikey';
   localStorage.setItem('yt_api_key', k);
   updateAuthUI();
   switchTab('home');
@@ -984,24 +819,19 @@ function saveKey() {
 
 function clearKey() {
   authState.apiKey = '';
-  authState.type = 'none';
   localStorage.removeItem('yt_api_key');
   document.getElementById('api-key-input').value = '';
   updateAuthUI();
-  renderNoAuth('home-list');
+  document.getElementById('home-list').innerHTML = '<div class="empty"><div class="empty-icon">🔑</div></div>';
 }
 
-// ─────────────────────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────────────────────
+// ──────────────────── INIT ────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Restore API key if exists
   document.getElementById('api-key-input').value = authState.apiKey;
+  updateAuthUI();
+  initGoogleSignIn();
 
-  // Setup Authentication
-  initAuth();
-
-  // Tab bar
+  // Tabs
   document.getElementById('tab-bar').addEventListener('click', e => {
     const btn = e.target.closest('[data-tab]');
     if (btn) switchTab(btn.dataset.tab);
@@ -1011,7 +841,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('chips').addEventListener('click', e => {
     const chip = e.target.closest('.chip');
     if (!chip) return;
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+    document.querySelectorAll('#chips .chip').forEach(c => c.classList.remove('on'));
     chip.classList.add('on');
     uiState.currentCat = chip.dataset.cat;
     loadHome();
@@ -1040,6 +870,7 @@ document.addEventListener('DOMContentLoaded', () => {
       loadHome(true);
     }
   });
+
   document.getElementById('search-view').addEventListener('scroll', () => {
     const el = document.getElementById('search-view');
     if (el.scrollTop + el.clientHeight >= el.scrollHeight - 400 && uiState.searchNext && !uiState.busy && uiState.currentSearch) {
@@ -1051,5 +882,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 </body>
-</html>
 </html>
